@@ -2,7 +2,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: url('img/background.png') no-repeat center/cover fixed;
+  background: url('background.png') no-repeat center/cover fixed;
   color: #e5e5e5;
   min-height: 100vh;
   display: flex;
@@ -369,4 +369,3 @@ footer p {
   background: linear-gradient(120deg, rgba(17, 17, 17, 0.08), rgba(17, 17, 17, 0.15));
   transform: translateX(5px);
 }
-
