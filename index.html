@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hermès — ENT School RP</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" href="https://hermes-ent.fr/img/logo.jpg" type="image/x-icon">
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --navy: #0d1117;
+      --navy-border: rgba(201, 168, 76, 0.18);
+      --text: #e2ddd6;
+      --text-muted: #8a8070;
+      --text-dim: #5a5448;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-ring {
+      position: fixed;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 168, 76, 0.08);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-ring:nth-child(2) {
+      width: 900px; height: 900px; top: -250px; right: -150px;
+      animation: ringPulse 9s ease-in-out infinite;
+    }
+    .bg-ring:nth-child(3) {
+      width: 600px; height: 600px; bottom: -180px; left: -200px;
+      animation: ringPulse 9s ease-in-out infinite -3s;
+    }
+    .bg-ring:nth-child(4) {
+      width: 420px; height: 420px; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: ringPulse3 9s ease-in-out infinite -6s;
+    }
+    @keyframes ringPulse {
+      0%,100% { opacity:0.5; }
+      50% { opacity:1; }
+    }
+    @keyframes ringPulse3 {
+      0%,100% { opacity:0.5; transform:translate(-50%,-50%) scale(1); }
+      50% { opacity:1; transform:translate(-50%,-50%) scale(1.06); }
+    }
+
+    .bg-glow {
+      position: fixed;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 65%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+      z-index: 0;
+      animation: glowBreath 6s ease-in-out infinite;
+      transition: transform 0.4s ease;
+    }
+    @keyframes glowBreath {
+      0%,100% { opacity:0.6; }
+      50% { opacity:1; }
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top:0;
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 0 5vw; height: 60px;
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(14px);
+      z-index: 100;
+      animation: navSlide 0.7s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes navSlide {
+      from { opacity:0; transform:translateY(-20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .logo {
+      font-family:'EB Garamond',serif;
+      font-size:1.1rem; font-weight:500;
+      letter-spacing:0.12em; text-transform:uppercase;
+      color:var(--text); text-decoration:none;
+      transition: color 0.3s;
+    }
+    .logo:hover { color:var(--gold-light); }
+    .logo span { color:var(--gold); font-weight:400; }
+    .nav-contact {
+      font-size:0.78rem; color:var(--text-muted);
+      text-decoration:none; display:inline-flex; align-items:center; gap:0.35rem;
+      transition: color 0.3s, transform 0.3s;
+    }
+    .nav-contact:hover { color:var(--gold); transform:translateX(4px); }
+
+    /* MAIN */
+    main {
+      flex:1; display:flex; align-items:center; justify-content:center;
+      padding: 60px 20px; position:relative; z-index:10;
+    }
+
+    /* CARD */
+    .card {
+      background: rgba(19,25,35,0.93);
+      border: 1px solid var(--navy-border);
+      border-radius: 16px;
+      padding: 3rem 3.5rem;
+      max-width: 580px; width:100%;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 80px rgba(201,168,76,0.04);
+      animation: cardRise 1s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+      position: relative; overflow: hidden;
+      transition: transform 0.1s ease, box-shadow 0.3s;
+    }
+    @keyframes cardRise {
+      from { opacity:0; transform:translateY(40px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .card::before {
+      content:''; position:absolute; inset:-1px; border-radius:17px;
+      background: linear-gradient(130deg,rgba(201,168,76,0.3),transparent 40%,rgba(201,168,76,0.12) 100%);
+      opacity:0; transition:opacity 0.5s; pointer-events:none; z-index:-1;
+    }
+    .card:hover::before { opacity:1; }
+    .card:hover { box-shadow: 0 50px 120px rgba(0,0,0,0.7), 0 0 100px rgba(201,168,76,0.07); }
+
+    /* BADGE */
+    .badge {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.25);
+      color:var(--gold-light); font-size:0.72rem; font-weight:500;
+      letter-spacing:0.08em; text-transform:uppercase;
+      padding:0.35rem 0.9rem; border-radius:999px; margin-bottom:1.4rem;
+      animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s both;
+    }
+    .badge-dot {
+      width:6px; height:6px; border-radius:50%; background:var(--gold);
+      animation: dotPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(201,168,76,0.6); }
+      50%      { opacity:0.5; box-shadow:0 0 0 5px rgba(201,168,76,0); }
+    }
+
+    /* H1 */
+    h1 {
+      font-family:'EB Garamond',serif;
+      font-size:2.2rem; font-weight:400; color:#fff;
+      line-height:1.15; margin-bottom:1.6rem;
+      animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.65s both;
+    }
+    h1 strong { color:var(--gold-light); font-weight:600; }
+
+    /* PARAGRAPHS staggered reveal */
+    .content p {
+      font-size:0.88rem; color:var(--text-muted);
+      line-height:1.8; margin-bottom:1rem;
+      opacity:0; transform:translateY(14px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .content p.visible { opacity:1; transform:translateY(0); }
+    .content p:last-child { margin-bottom:0; }
+    .content p strong { color:var(--gold-light); font-weight:500; }
+    .content p a {
+      color:var(--gold); text-decoration:none;
+      border-bottom:1px solid rgba(201,168,76,0.3);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .content p a:hover { color:#fff; border-bottom-color:#fff; }
+
+    /* HIGHLIGHT */
+    .highlight {
+      background:rgba(201,168,76,0.07); border-left:2px solid var(--gold);
+      padding:1rem 1.2rem; border-radius:0 6px 6px 0; margin:1rem 0;
+      opacity:0; transform:translateX(-12px);
+      transition: opacity 0.6s ease, transform 0.6s ease, background 0.3s;
+    }
+    .highlight.visible { opacity:1; transform:translateX(0); }
+    .highlight:hover { background:rgba(201,168,76,0.13); }
+    .highlight p { color:var(--text-muted)!important; font-size:0.86rem!important; opacity:1!important; transform:none!important; }
+
+    /* DIVIDER */
+    .divider {
+      width:100%; height:1px;
+      background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent);
+      margin:1.8rem 0;
+      animation: fadeUp 0.7s ease 1.2s both;
+    }
+
+    /* BTN */
+    .actions { animation: fadeUp 0.7s ease 1.3s both; }
+    .btn {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      padding:0.65rem 1.5rem; border-radius:8px;
+      font-size:0.83rem; font-weight:500; font-family:'DM Sans',sans-serif;
+      text-decoration:none; border:1px solid rgba(201,168,76,0.3);
+      background:rgba(201,168,76,0.1); color:var(--gold-light);
+      position:relative; overflow:hidden;
+      transition: background 0.3s, border-color 0.3s, color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .btn::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.09) 50%,transparent 70%);
+      transform:translateX(-100%); transition:transform 0.55s ease;
+    }
+    .btn:hover::after { transform:translateX(100%); }
+    .btn:hover {
+      background:rgba(201,168,76,0.2); border-color:var(--gold); color:#fff;
+      transform:translateY(-3px); box-shadow:0 8px 24px rgba(201,168,76,0.2);
+    }
+    .btn:active { transform:translateY(-1px); }
+
+    /* FEATURES */
+    .features {
+      display:grid; grid-template-columns:repeat(3,1fr);
+      border:1px solid var(--navy-border); border-radius:10px;
+      overflow:hidden; margin-top:1.8rem;
+      background:rgba(201,168,76,0.03);
+      animation: fadeUp 0.7s ease 1.5s both;
+    }
+    .feat {
+      padding:1.2rem 1rem; text-align:center;
+      transition: background 0.3s, transform 0.3s;
+      position:relative;
+    }
+    .feat::after {
+      content:''; position:absolute; bottom:0; left:50%;
+      width:0; height:2px; background:var(--gold);
+      transform:translateX(-50%); transition:width 0.3s ease;
+    }
+    .feat:hover::after { width:60%; }
+    .feat:hover { background:rgba(201,168,76,0.08); transform:translateY(-3px); }
+    .feat + .feat { border-left:1px solid rgba(201,168,76,0.1); }
+    .feat i {
+      color:var(--gold); font-size:0.9rem;
+      margin-bottom:0.5rem; display:block;
+      transition: transform 0.3s, color 0.3s;
+    }
+    .feat:hover i { transform:scale(1.25) rotate(-6deg); color:var(--gold-light); }
+    .feat h3 {
+      font-family:'EB Garamond',serif; font-size:0.9rem;
+      font-weight:600; color:var(--text); margin-bottom:0.25rem;
+    }
+    .feat p { font-size:0.72rem; color:var(--text-dim); line-height:1.5; }
+
+    /* FOOTER */
+    footer {
+      position:relative; z-index:10;
+      padding:1.2rem 5vw;
+      border-top:1px solid rgba(201,168,76,0.08);
+      background:rgba(13,17,23,0.6); text-align:center;
+      animation: fadeUp 0.6s ease 1.8s both;
+    }
+    footer p { font-size:0.75rem; color:var(--text-dim); }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    @media (max-width:580px) {
+      .card { padding:2rem 1.4rem; }
+      h1 { font-size:1.7rem; }
+      .features { grid-template-columns:1fr; }
+      .feat + .feat { border-left:none; border-top:1px solid rgba(201,168,76,0.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="canvas"></canvas>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-glow" id="glow"></div>
+
+  <nav>
+    <a href="#" class="logo">Hermès <span>ENT</span></a>
+    <a href="mailto:contact@hermes-ent.fr" class="nav-contact">
+      <i class="fa-solid fa-envelope" style="font-size:0.7rem;"></i>contact@hermes-ent.fr
+    </a>
+  </nav>
+
+  <main>
+    <div class="card" id="card">
+
+      <div class="badge">
+        <span class="badge-dot"></span>
+        En cours de développement
+      </div>
+
+      <h1>L'ENT de<br/><strong>School RP</strong></h1>
+
+      <div class="content">
+        <p>
+          Le site <a href="https://hermes-ent.fr/" target="_blank">https://hermes-ent.fr/</a>
+          est un ENT (Espace Numérique de Travail) développé dans un cadre de School RP,
+          avec pour objectif principal de servir de support d'entraînement pour les développeurs.
+        </p>
+        <p>
+          Ce projet a été pensé comme un environnement simple et accessible permettant de s'exercer
+          sur différentes technologies web telles que HTML, CSS, JavaScript et PHP.
+          Il ne s'agit pas d'un produit final complexe, mais d'un espace évolutif où chacun peut
+          expérimenter, tester des idées et améliorer ses compétences.
+        </p>
+        <p><strong>📌 Participer au projet</strong></p>
+        <div class="highlight" id="hl">
+          <p>
+            Si vous souhaitez vous entraîner sur un projet web de ce type, que ce soit pour apprendre,
+            tester ou développer de nouvelles fonctionnalités, vous êtes les bienvenus.
+          </p>
+        </div>
+        <p>
+          N'hésitez pas à nous contacter si vous souhaitez contribuer ou proposer des idées.
+          Toute participation est la bienvenue et sera un vrai coup de pouce pour faire évoluer le projet.
+        </p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="actions">
+        <a href="https://hermes-ent.fr/" class="btn" target="_blank">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Accéder à l'ENT
+        </a>
+      </div>
+
+      <div class="features">
+        <div class="feat">
+          <i class="fa-solid fa-school"></i>
+          <h3>Vie scolaire</h3>
+          <p>Emploi du temps, cours et activités directement dans l'ENT.</p>
+        </div>
+        <div class="feat">
+          <i class="fa-solid fa-gamepad"></i>
+          <h3>School RP</h3>
+          <p>Pensé pour enrichir le roleplay sur Roblox School RP.</p>
+        </div>
+        <div class="feat">
+          <i class="fa-solid fa-code"></i>
+          <h3>Bientôt disponible</h3>
+          <p>Le jeu et l'ENT sont en cours de création.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Hermès ENT — contact@hermes-ent.fr</p>
+  </footer>
+
+  <script>
+    /* PARTICLES */
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+
+    class Particle {
+      constructor() { this.reset(true); }
+      reset(rand) {
+        this.x = Math.random() * canvas.width;
+        this.y = rand ? Math.random() * canvas.height : canvas.height + 10;
+        this.r = Math.random() * 1.4 + 0.3;
+        this.alpha = Math.random() * 0.35 + 0.05;
+        this.vx = (Math.random() - 0.5) * 0.22;
+        this.vy = (Math.random() - 0.5) * 0.22;
+        this.life = 0;
+        this.maxLife = Math.random() * 280 + 180;
+      }
+      update() {
+        this.x += this.vx; this.y += this.vy; this.life++;
+        if (this.life > this.maxLife) this.reset(true);
+      }
+      draw() {
+        const t = this.life / this.maxLife;
+        const a = this.alpha * Math.sin(Math.PI * t);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201,168,76,${a})`;
+        ctx.fill();
+      }
+    }
+
+    const pts = Array.from({length: 65}, () => new Particle());
+
+    (function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pts.forEach(p => { p.update(); p.draw(); });
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i+1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          if (d < 110) {
+            ctx.beginPath();
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.strokeStyle = `rgba(201,168,76,${0.07*(1-d/110)})`;
+            ctx.lineWidth = 0.5; ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(loop);
+    })();
+
+    /* PARALLAX GLOW */
+    const glow = document.getElementById('glow');
+    document.addEventListener('mousemove', e => {
+      const x = (e.clientX/innerWidth - 0.5) * 60;
+      const y = (e.clientY/innerHeight - 0.5) * 60;
+      glow.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    });
+
+    /* CARD TILT */
+    const card = document.getElementById('card');
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const dx = (e.clientX - r.left - r.width/2) / (r.width/2);
+      const dy = (e.clientY - r.top - r.height/2) / (r.height/2);
+      card.style.transform = `perspective(1000px) rotateY(${dx*3.5}deg) rotateX(${-dy*3.5}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'transform 0.7s ease';
+      card.style.transform = 'perspective(1000px) rotateY(0) rotateX(0)';
+      setTimeout(() => card.style.transition = '', 700);
+    });
+
+    /* STAGGERED REVEAL */
+    const revealEls = document.querySelectorAll('.content p, .highlight');
+    setTimeout(() => {
+      revealEls.forEach((el, i) => {
+        setTimeout(() => el.classList.add('visible'), 900 + i * 160);
+      });
+    }, 100);
+  </script>
+</body>
+</html>
